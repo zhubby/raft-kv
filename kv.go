@@ -24,32 +24,35 @@ func newMemoryKV() *memoryKV {
 
 func (s *memoryKV) Get(key string) string {
 	s.RLocker()
-	defer s.RUnlock()
-	return s.data[key]
+	value := s.data[key]
+	s.RUnlock()
+	return value
 }
 
 func (s *memoryKV) Set(key, value string) {
 	s.Lock()
-	defer s.Unlock()
 	s.data[key] = value
+	s.Unlock()
 }
 
 func (s *memoryKV) Del(key string) {
 	s.Lock()
-	defer s.Unlock()
 	delete(s.data, key)
+	s.Unlock()
+
 }
 
 func (s *memoryKV) Marshal() ([]byte, error) {
-	s.RLocker()
-	defer s.RUnlock()
 	var b = bytes.NewBuffer(nil)
+	s.RLocker()
 	err := gob.NewEncoder(b).Encode(s.data)
+	s.RUnlock()
 	return b.Bytes(), err
 }
 
 func (s *memoryKV) Unmarshal(b []byte) error {
 	s.Lock()
-	defer s.Unlock()
-	return gob.NewDecoder(bytes.NewBuffer(b)).Decode(s)
+	err := gob.NewDecoder(bytes.NewBuffer(b)).Decode(s)
+	s.Unlock()
+	return err
 }

@@ -45,7 +45,7 @@ func Test_Node2(t *testing.T) {
 }
 
 func Test_Node3(t *testing.T) {
-	flag.Set("raft-peer", "127.0.0.1:8003")
+	flag.Set("raft-peer", "127.0.0.1:8002")
 	flag.Set("data-dir", filepath.Join(os.TempDir(), "node3"))
 	tx := time.NewTicker(5 * time.Second)
 	_, err := raft_kv.New(raft_kv.Default())
@@ -61,6 +61,7 @@ func Test_Node3(t *testing.T) {
 }
 
 func init() {
+	println(os.TempDir())
 	os.MkdirAll(filepath.Join(os.TempDir(), "node1"), 0700)
 	os.MkdirAll(filepath.Join(os.TempDir(), "node2"), 0700)
 	os.MkdirAll(filepath.Join(os.TempDir(), "node3"), 0700)

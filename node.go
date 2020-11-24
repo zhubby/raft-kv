@@ -4,6 +4,7 @@ import (
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/raft"
 	raftboltdb "github.com/hashicorp/raft-boltdb"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -82,9 +83,10 @@ func New(opt *Options) (*RaftKV, error) {
 					if rkv.opt.JoinPeer != "" {
 						peers := strings.Split(rkv.opt.JoinPeer, ",")
 						for _, v := range peers {
-							if err := rkv.join(v); err != nil {
-								rkv.logger.Error("join cluster failed", err)
-							}
+							go func(peer string) {
+								log.Print("add cluster")
+								rkv.join(peer)
+							}(v)
 						}
 					}
 				}
